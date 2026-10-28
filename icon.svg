@@ -1,1 +1,386 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><rect width="512" height="512" rx="100" fill="#123d33"/><circle cx="256" cy="220" r="112" fill="#f0bd4c"/><path d="M178 220h156M256 142v156M202 166l108 108M310 166L202 274" stroke="#123d33" stroke-width="13" stroke-linecap="round"/><text x="256" y="390" font-family="Arial,sans-serif" font-weight="bold" font-size="62" text-anchor="middle" fill="#fff">GK</text></svg>
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#123d33">
+  <title>OISF Constable GK Test</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #f1f5f2;
+      color: #18352d;
+    }
+
+    header {
+      text-align: center;
+      background: #123d33;
+      color: white;
+      padding: 24px 12px;
+      border-radius: 18px;
+    }
+
+    .logo {
+      width: 90px;
+      height: 90px;
+      margin-bottom: 10px;
+    }
+
+    header h1 {
+      margin: 8px 0;
+      font-size: 24px;
+    }
+
+    header p {
+      margin: 8px 0 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      background: white;
+      padding: 22px;
+      border-radius: 16px;
+      box-shadow: 0 4px 15px #00000012;
+    }
+
+    .info {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    #question {
+      font-size: 20px;
+      line-height: 1.5;
+    }
+
+    .option {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      margin: 12px 0;
+      border: 2px solid #dce5df;
+      border-radius: 10px;
+      background: white;
+      color: #18352d;
+      font-size: 16px;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .option:hover:not(:disabled) {
+      border-color: #123d33;
+      background: #f1f8f3;
+    }
+
+    .option:disabled {
+      cursor: default;
+      opacity: 1;
+    }
+
+    .correct {
+      background: #d9f5df;
+      border-color: #218838;
+    }
+
+    .wrong {
+      background: #ffe1e1;
+      border-color: #dc3545;
+    }
+
+    #feedback {
+      font-weight: bold;
+      line-height: 1.5;
+      margin: 18px 0;
+    }
+
+    .main-button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 12px;
+      border: none;
+      border-radius: 10px;
+      background: #123d33;
+      color: white;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .main-button:disabled {
+      background: #9aa9a2;
+      cursor: default;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    footer {
+      text-align: center;
+      color: #52645c;
+      font-size: 13px;
+      margin: 24px 0 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <svg class="logo"
+         xmlns="http://www.w3.org/2000/svg"
+         viewBox="0 0 512 512"
+         role="img"
+         aria-label="GK Logo">
+      <rect width="512" height="512" rx="100" fill="#123d33"/>
+      <circle cx="256" cy="220" r="112" fill="#f0bd4c"/>
+      <path d="M178 220h156M256 142v156M202 166l108 108M310 166L202 274"
+            stroke="#123d33"
+            stroke-width="13"
+            stroke-linecap="round"/>
+      <text x="256" y="390"
+            font-family="Arial,sans-serif"
+            font-weight="bold"
+            font-size="62"
+            text-anchor="middle"
+            fill="#fff">GK</text>
+    </svg>
+
+    <h1>OISF Constable GK</h1>
+    <p>General Knowledge Practice Test</p>
+  </header>
+
+  <main class="container">
+
+    <div id="quiz">
+      <div class="info">
+        <span id="progress">सवाल 1/10</span>
+        <span id="score">स्कोर: 0</span>
+      </div>
+
+      <h2 id="question">सवाल लोड हो रहा है...</h2>
+
+      <div id="options"></div>
+
+      <p id="feedback" aria-live="polite"></p>
+
+      <button id="nextButton"
+              class="main-button"
+              disabled
+              onclick="nextQuestion()">
+        अगला सवाल →
+      </button>
+    </div>
+
+    <div id="result" class="hidden">
+      <h2>टेस्ट पूरा हुआ! 🎉</h2>
+      <p id="finalScore"></p>
+      <p id="message"></p>
+
+      <button class="main-button" onclick="restartQuiz()">
+        दोबारा टेस्ट दें
+      </button>
+    </div>
+
+  </main>
+
+  <footer>
+    OISF Constable GK Practice | Educational Quiz
+  </footer>
+
+  <script>
+    const questions = [
+      {
+        question: "भारत की राजधानी क्या है?",
+        options: ["मुंबई", "नई दिल्ली", "कोलकाता", "चेन्नई"],
+        answer: 1
+      },
+      {
+        question: "भारत का राष्ट्रीय पशु कौन है?",
+        options: ["शेर", "हाथी", "बाघ", "घोड़ा"],
+        answer: 2
+      },
+      {
+        question: "ओडिशा की राजधानी क्या है?",
+        options: ["कटक", "पुरी", "भुवनेश्वर", "संबलपुर"],
+        answer: 2
+      },
+      {
+        question: "भारत का संविधान कब लागू हुआ?",
+        options: [
+          "15 अगस्त 1947",
+          "26 जनवरी 1950",
+          "2 अक्टूबर 1950",
+          "26 नवंबर 1949"
+        ],
+        answer: 1
+      },
+      {
+        question: "भारत का राष्ट्रीय पक्षी कौन है?",
+        options: ["तोता", "मोर", "कबूतर", "हंस"],
+        answer: 1
+      },
+      {
+        question: "सूर्य किस दिशा से निकलता है?",
+        options: ["पश्चिम", "उत्तर", "दक्षिण", "पूर्व"],
+        answer: 3
+      },
+      {
+        question: "भारत में कुल कितने राज्य हैं?",
+        options: ["27", "28", "29", "30"],
+        answer: 1
+      },
+      {
+        question: "भारत की मुद्रा क्या है?",
+        options: ["डॉलर", "यूरो", "रुपया", "येन"],
+        answer: 2
+      },
+      {
+        question: "ओडिशा का प्रसिद्ध शास्त्रीय नृत्य कौन-सा है?",
+        options: ["कथक", "भरतनाट्यम", "ओडिसी", "कुचिपुड़ी"],
+        answer: 2
+      },
+      {
+        question: "भारत का स्वतंत्रता दिवस कब मनाया जाता है?",
+        options: [
+          "26 जनवरी",
+          "15 अगस्त",
+          "2 अक्टूबर",
+          "14 नवंबर"
+        ],
+        answer: 1
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let answered = false;
+
+    const questionElement = document.getElementById("question");
+    const optionsElement = document.getElementById("options");
+    const feedbackElement = document.getElementById("feedback");
+    const progressElement = document.getElementById("progress");
+    const scoreElement = document.getElementById("score");
+    const nextButton = document.getElementById("nextButton");
+
+    function loadQuestion() {
+      answered = false;
+
+      const q = questions[currentQuestion];
+
+      progressElement.textContent =
+        `सवाल ${currentQuestion + 1}/${questions.length}`;
+
+      scoreElement.textContent = `स्कोर: ${score}`;
+      questionElement.textContent = q.question;
+      feedbackElement.textContent = "";
+      optionsElement.replaceChildren();
+
+      q.options.forEach((option, index) => {
+        const button = document.createElement("button");
+
+        button.className = "option";
+        button.textContent =
+          `${String.fromCharCode(65 + index)}. ${option}`;
+
+        button.onclick = () => checkAnswer(index, button);
+
+        optionsElement.appendChild(button);
+      });
+
+      nextButton.disabled = true;
+
+      nextButton.textContent =
+        currentQuestion === questions.length - 1
+          ? "रिज़ल्ट देखें"
+          : "अगला सवाल →";
+    }
+
+    function checkAnswer(selectedIndex, selectedButton) {
+      if (answered) return;
+
+      answered = true;
+
+      const q = questions[currentQuestion];
+      const buttons = optionsElement.querySelectorAll("button");
+
+      buttons.forEach(button => {
+        button.disabled = true;
+      });
+
+      if (selectedIndex === q.answer) {
+        score++;
+        selectedButton.classList.add("correct");
+        feedbackElement.textContent = "✅ सही जवाब!";
+      } else {
+        selectedButton.classList.add("wrong");
+        buttons[q.answer].classList.add("correct");
+
+        feedbackElement.textContent =
+          `❌ गलत जवाब। सही उत्तर: ${q.options[q.answer]}`;
+      }
+
+      scoreElement.textContent = `स्कोर: ${score}`;
+      nextButton.disabled = false;
+    }
+
+    function nextQuestion() {
+      if (!answered) return;
+
+      currentQuestion++;
+
+      if (currentQuestion < questions.length) {
+        loadQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      document.getElementById("quiz").classList.add("hidden");
+      document.getElementById("result").classList.remove("hidden");
+
+      document.getElementById("finalScore").textContent =
+        `आपका स्कोर: ${score}/${questions.length}`;
+
+      const percentage = (score / questions.length) * 100;
+
+      let message;
+
+      if (percentage >= 80) {
+        message = "बहुत बढ़िया! आपकी तैयारी अच्छी है।";
+      } else if (percentage >= 50) {
+        message = "अच्छा प्रयास! अभ्यास जारी रखें।";
+      } else {
+        message = "अभी और अभ्यास करें। आप बेहतर कर सकते हैं!";
+      }
+
+      document.getElementById("message").textContent = message;
+    }
+
+    function restartQuiz() {
+      currentQuestion = 0;
+      score = 0;
+
+      document.getElementById("result").classList.add("hidden");
+      document.getElementById("quiz").classList.remove("hidden");
+
+      loadQuestion();
+    }
+
+    loadQuestion();
+  </script>
+
+</body>
+</html><svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><rect width="512" height="512" rx="100" fill="#123d33"/><circle cx="256" cy="220" r="112" fill="#f0bd4c"/><path d="M178 220h156M256 142v156M202 166l108 108M310 166L202 274" stroke="#123d33" stroke-width="13" stroke-linecap="round"/><text x="256" y="390" font-family="Arial,sans-serif" font-weight="bold" font-size="62" text-anchor="middle" fill="#fff">GK</text></svg>
